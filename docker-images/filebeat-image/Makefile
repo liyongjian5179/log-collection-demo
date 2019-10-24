@@ -7,6 +7,7 @@ CONTAINER_NAME = test-filebeat
 DOCKER_REGISTRY = registry.cn-beijing.aliyuncs.com/liyongjian5179
 
 build:
+	bash ./change_tag.sh $(TAG)
 	docker build -t $(DOCKER_REGISTRY)/filebeat:$(TAG) .
 
 push: 
@@ -14,6 +15,7 @@ push:
 
 clean:
 	docker rm -f $(CONTAINER_NAME)
+	docker rmi -f $(DOCKER_REGISTRY)/filebeat:$(TAG)
 
 test:
 	docker run  -d --name $(CONTAINER_NAME) $(DOCKER_REGISTRY)/filebeat:$(TAG) 
