@@ -12,7 +12,7 @@ make all
 先在 `Makefile` 中修改版本，然后执行`make build`即可
   
 ## make 命令使用说明
-`make build`:	构建镜像
-`make all`:	构建镜像，上传仓库
+`make build`:	构建镜像  
+`make all`:	构建镜像，上传仓库  
 `make clean`:	清理 docker 容器镜像，及测试容器
 
