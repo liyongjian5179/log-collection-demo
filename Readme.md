@@ -111,7 +111,17 @@ registry.cn-beijing.aliyuncs.com/liyongjian5179/log-collection-demo:latest
 ## 本地测试
 直接执行 `./build_start.sh` 脚本即可
 
+## 日志输出路径  
+`/usr/local/logs`  
 
+## 日志方案
+### 1. filebeat + sidecar 的方式
+```bash
+cd log-sidecar
+kubectl apply -f deployment.yaml
+```
+
+### 2.
 
 
 

@@ -1,0 +1,155 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: log-collection-demo-filebeat
+  namespace: default
+spec:
+  replicas: 1
+  template:
+    metadata:
+      namespace: default
+      labels:
+        app: log-collection-demo-filebeat
+    spec:
+      containers:
+      - name : log-collection-demo
+        image: registry.cn-beijing.aliyuncs.com/liyongjian5179/log-collection-demo
+        imagePullPolicy: Always
+        resources:
+          limits:
+            memory: "512Mi"
+          requests:
+            memory: "128Mi"
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: log-collection-demo-logs
+          mountPath: /usr/local/logs
+#        线上环境如果开启 liveness 的话一旦出问题就不能很好的保护现场
+#        livenessProbe:
+#          httpGet:
+#            path: /actuator/health
+#            port: 80
+#            scheme: HTTP
+#          initialDelaySeconds: 60
+#          timeoutSeconds: 2   
+#          successThreshold: 1
+#          failureThreshold: 5                        
+        readinessProbe: 
+          httpGet:
+            path: /actuator/health
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 20
+          periodSeconds: 10 
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 3          
+      - image: registry.cn-beijing.aliyuncs.com/liyongjian5179/filebeat:7.4.1
+        imagePullPolicy: Always
+        name: filebeat
+        env:
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        resources:
+          limits:
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        volumeMounts:
+        - name: log-collection-demo-logs
+          mountPath: /log
+        - name: log-collection-demo-filebeat-config
+          mountPath: /etc/filebeat/
+        # - mountPath: /var/run/docker.sock
+        #   name: docker-socket
+        # command:
+        #   - "filebeat"
+        #   - "-e"
+        #   - "-c"
+        #   - "/etc/filebeat/filebeat.yml"
+#      imagePullSecrets:
+#        - name: myaliyunregistrykey
+      volumes:
+      - name: log-collection-demo-logs
+        emptyDir: {}
+      - name: log-collection-demo-filebeat-config
+        configMap:
+          name: log-collection-demo-filebeat-config
+      # - name: docker-socket
+      #   hostPath:
+      #     path: /var/run/docker.sock
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: log-collection-demo-filebeat
+  namespace: default
+  labels:
+    app: log-collection-demo-filebeat
+spec:
+  ports:
+  - port: 8080
+    targetPort: 8080
+    protocol: TCP
+    name: http
+  selector:
+    app: log-collection-demo-filebeat
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: log-collection-demo-filebeat-config
+data:
+  filebeat.yml: |
+    filebeat.inputs:
+    - type: log
+      paths:
+        - "/log/*.log"
+      exclude_lines: ["^DBG","^$"]
+      encoding: utf-8
+      multiline.pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}'
+      multiline.negate: true
+      multiline.match: after
+      multiline.timeout: 10s
+      fields_under_root:  true
+      fields:
+        POD_NAME: '${POD_NAME}'
+        POD_IP: '${POD_IP}'
+    output.file:
+      path: "/tmp"
+      filename: "log-collection-demo-filebeat.txt"
+      rotate_every_kb: 10000
+      number_of_files: 7
+      permissions: 0600
+    processors:
+    - add_cloud_metadata: ~
+    # - add_host_metadata:
+    #     netinfo.enabled: true
+    # - add_kubernetes_metadata:
+    #     in_cluster: true
+    # - add_docker_metadata: ~
+    #     host: "unix:///var/run/docker.sock"
+
+#    output.elasticsearch:
+#      hosts: ["172.23.5.255:9200"]
+#      username: "elastic"
+#      password: "changeme"
+#      index: "log-collection-demo-filebeat-test"
+
+#    output.kafka:
+#      enabled: true
+#      hosts: ["10.110.156.67:32200"]
+#      topic: beats
+#      compression: gzip
+#      max_message_bytes: 1000000
+#

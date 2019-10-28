@@ -6,8 +6,8 @@
 JAVA_OPTIONS="-server -Xms256m -Xmx256m -Duser.timezone=Asia/Shanghai -Djava.security.egd=file:/dev/./urandom"
 
 cd /usr/local
-mkdir -p /logs/log-collection-demo/$HOSTNAME/logs
-ln -s /logs/log-collection-demo/$HOSTNAME/logs /usr/local/logs
+#mkdir -p /logs/log-collection-demo/$HOSTNAME/logs
+#ln -s /logs/log-collection-demo/$HOSTNAME/logs /usr/local/logs
 
 echo 'JAVA_OPTIONS:'$JAVA_OPTIONS
 
