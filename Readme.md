@@ -114,14 +114,28 @@ registry.cn-beijing.aliyuncs.com/liyongjian5179/log-collection-demo:latest
 ## 日志输出路径  
 `/usr/local/logs`  
 
-## 日志方案
+## 业务日志收集方案
 ### 1. filebeat + sidecar 的方式
 ```bash
 cd log-sidecar
 kubectl apply -f deployment.yaml
 ```
 
-### 2.
+### 2. filebeat + daemonset 的方式(默认不收集 k8s 系统日志)
+```bash
+cd log-daemonset
+kubectl apply -f daemonset.yaml
+kubectl apply -f java-demo.yaml
+```
+应用通过 annotations 的方式开启日志收集，
+    `filebeat.harvest: "true" `为开启，
+    `filebeat.index: "xxxxxxxx" `写成对应的服务名即可  
+
+```bash  
+annotations:
+  filebeat.harvest: "true"
+  filebeat.index: "xxxxxxxx"
+```
 
 
 

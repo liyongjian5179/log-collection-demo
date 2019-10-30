@@ -1,0 +1,96 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: log-collection-demo-daemonset
+  namespace: default
+  annotations:
+    filebeat.harvest: "true"
+    filebeat.index: "log-collection-demo-daemonset"
+spec:
+  replicas: 1
+  template:
+    metadata:
+      namespace: default
+      labels:
+        app: log-collection-demo-daemonset
+      annotations:
+        filebeat.harvest: "true"
+        filebeat.index: "log-collection-demo-daemonset"
+    spec:
+      containers:
+      - name : log-collection-demo
+        image: registry.cn-beijing.aliyuncs.com/liyongjian5179/log-collection-demo:test
+        imagePullPolicy: Always
+        resources:
+          limits:
+            memory: "512Mi"
+          requests:
+            memory: "128Mi"
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: log-collection-demo-logs
+          mountPath: /www/webcode/logs
+#        线上环境如果开启 liveness 的话一旦出问题就不能很好的保护现场
+#        livenessProbe:
+#          httpGet:
+#            path: /actuator/health
+#            port: 80
+#            scheme: HTTP
+#          initialDelaySeconds: 60
+#          timeoutSeconds: 2   
+#          successThreshold: 1
+#          failureThreshold: 5                        
+        readinessProbe: 
+          httpGet:
+            path: /actuator/health
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 20
+          periodSeconds: 10 
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 3          
+#      imagePullSecrets:
+#        - name: myaliyunregistrykey
+      volumes:
+      - name: log-collection-demo-logs
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: log-collection-demo-daemonset
+  namespace: default
+  labels:
+    app: log-collection-demo-daemonset
+spec:
+  ports:
+  - port: 8080
+    targetPort: 8080
+    protocol: TCP
+    name: http
+  selector:
+    app: log-collection-demo-daemonset
+
+---
+# apiVersion: extensions/v1beta1
+# kind: Ingress
+# metadata:
+#   name: log-collection-demo-daemonset
+#   namespace: default
+#   labels:
+#     app.kubernetes.io/instance: log-collection-demo-daemonset
+#     app.kubernetes.io/name: log-collection-demo-daemonset
+#   annotations:
+#     # kubernetes.io/ingress.class: nginx
+#     # kubernetes.io/tls-acme: "true"
+# spec:
+#   rules:
+#   - host: log-collection-demo-daemonset.xxxxxxxxxxxxxxxx.cn-beijing.alicontainer.com
+#     http:
+#       paths:
+#       - backend:
+#           serviceName: log-collection-demo-daemonset
+#           servicePort: 8080
+#         path: /

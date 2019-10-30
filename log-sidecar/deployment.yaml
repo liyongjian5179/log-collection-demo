@@ -144,7 +144,7 @@ data:
 #      hosts: ["172.23.5.255:9200"]
 #      username: "elastic"
 #      password: "changeme"
-#      index: "log-collection-demo-filebeat-test"
+#      index: "log-collection-demo-filebeat"
 
 #    output.kafka:
 #      enabled: true
@@ -153,3 +153,24 @@ data:
 #      compression: gzip
 #      max_message_bytes: 1000000
 #
+---
+# apiVersion: extensions/v1beta1
+# kind: Ingress
+# metadata:
+#   name: log-collection-demo-filebeat
+#   namespace: test
+#   labels:
+#     app.kubernetes.io/instance: log-collection-demo-filebeat
+#     app.kubernetes.io/name: log-collection-demo-filebeat
+#   annotations:
+#     # kubernetes.io/ingress.class: nginx
+#     # kubernetes.io/tls-acme: "true"
+# spec:
+#   rules:
+#   - host: log-collection-demo-filebeat.xxxxxxxxxxxxxxx.cn-beijing.alicontainer.com
+#     http:
+#       paths:
+#       - backend:
+#           serviceName: log-collection-demo-filebeat
+#           servicePort: 8080
+#         path: /
