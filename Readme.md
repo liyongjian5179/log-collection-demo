@@ -137,6 +137,11 @@ annotations:
   filebeat.index: "xxxxxxxx"
 ```
 
+### 3. fluentd 收集所以容器日志  
+参照 `https://github.com/fluent/fluentd-kubernetes-daemonset` 即可
+```bash
+$ git clone https://github.com/fluent/fluentd-kubernetes-daemonset
+```
 
 
 
