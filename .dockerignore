@@ -6,3 +6,6 @@ logs
 src
 target/*
 !target/*.jar
+docker-images
+log-sidecar
+log-daemonset
