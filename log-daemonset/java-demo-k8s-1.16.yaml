@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: log-collection-demo-daemonset
@@ -7,6 +7,9 @@ metadata:
     filebeat.harvest: "true"
     filebeat.index: "log-collection-demo-daemonset"
 spec:
+  selector:
+    matchLabels:
+      app: log-collection-demo-daemonset
   replicas: 1
   template:
     metadata:
@@ -19,7 +22,7 @@ spec:
     spec:
       containers:
       - name : log-collection-demo
-        image: registry.cn-beijing.aliyuncs.com/liyongjian5179/log-collection-demo:test
+        image: registry.cn-beijing.aliyuncs.com/liyongjian5179/log-collection-demo:latest
         imagePullPolicy: Always
         resources:
           limits:
