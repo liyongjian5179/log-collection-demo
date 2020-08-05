@@ -89,6 +89,7 @@ system_load_average_1m{application="log-collection-demo",} 0.11
 
 ## Grafana 监控 JMX 模板
 Spring Boot 2.1 Statistics
+
 https://grafana.com/grafana/dashboards/10280
 
 ## 健康检查
