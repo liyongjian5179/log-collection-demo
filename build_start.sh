@@ -8,7 +8,7 @@ docker rm -f lyj
 
 docker build -t ${IMAGE_NAME} .
 
-docker run -d  --name=lyj -p8080:8080 ${IMAGE_NAME}
+docker run -d  --name=lyj -p8080:8080 -p8081:8081  ${IMAGE_NAME}
 
 docker tag ${IMAGE_NAME}  registry.cn-beijing.aliyuncs.com/liyongjian5179/${IMAGE_NAME}
 

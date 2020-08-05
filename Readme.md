@@ -56,7 +56,7 @@ curl http://localhost:8080/hello
 
 ## Prometheus 监控项
 ```bash
-curl http://localhost:8080/actuator/prometheus
+curl http://localhost:8081/actuator/prometheus
 ```
 返回：
 ```bash
