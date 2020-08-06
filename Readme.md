@@ -94,7 +94,7 @@ https://grafana.com/grafana/dashboards/10280
 
 ## 健康检查
 ```bash
-curl http://localhost:8080/actuator/health
+curl http://localhost:8081/actuator/health
 ```
 返回：{"status":"UP"}
 
