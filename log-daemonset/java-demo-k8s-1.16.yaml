@@ -35,15 +35,15 @@ spec:
         - name: log-collection-demo-logs
           mountPath: /www/webcode/logs
 #        线上环境如果开启 liveness 的话一旦出问题就不能很好的保护现场
-#        livenessProbe:
-#          httpGet:
-#            path: /actuator/health
-#            port: 80
-#            scheme: HTTP
-#          initialDelaySeconds: 60
-#          timeoutSeconds: 2   
-#          successThreshold: 1
-#          failureThreshold: 5                        
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 2   
+          successThreshold: 1
+          failureThreshold: 5                        
         readinessProbe: 
           httpGet:
             path: /actuator/health
